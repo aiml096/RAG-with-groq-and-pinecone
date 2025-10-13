@@ -38,6 +38,30 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
+        }
+
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .connection-status.connected {
+            background: #10b981;
+        }
+
+        .connection-status.disconnected {
+            background: #ef4444;
+        }
+
+        .connection-status.checking {
+            background: #f59e0b;
         }
 
         .chat-header h1 {
@@ -78,6 +102,7 @@
             border-radius: 18px;
             font-size: 14px;
             line-height: 1.4;
+            word-wrap: break-word;
         }
 
         .user .message-content {
@@ -98,6 +123,15 @@
             font-size: 11px;
             opacity: 0.7;
             margin-top: 5px;
+            text-align: right;
+        }
+
+        .user .message-time {
+            text-align: right;
+        }
+
+        .bot .message-time {
+            text-align: left;
         }
 
         .chat-input-container {
@@ -122,10 +156,18 @@
             max-height: 120px;
             outline: none;
             transition: border-color 0.2s;
+            font-family: inherit;
         }
 
         #messageInput:focus {
             border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        #messageInput:disabled {
+            background-color: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
         }
 
         #sendButton {
@@ -137,16 +179,19 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            min-width: 80px;
         }
 
         #sendButton:hover:not(:disabled) {
             background: #4338ca;
+            transform: translateY(-1px);
         }
 
         #sendButton:disabled {
             background: #9ca3af;
             cursor: not-allowed;
+            transform: none;
         }
 
         .typing-indicator {
@@ -159,6 +204,7 @@
             align-items: center;
             gap: 8px;
             max-width: 70%;
+            animation: fadeIn 0.3s ease-in;
         }
 
         .typing-dots {
@@ -182,6 +228,11 @@
             40% { transform: scale(1); opacity: 1; }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .welcome-message {
             text-align: center;
             color: #6b7280;
@@ -191,6 +242,42 @@
         .welcome-message h3 {
             margin-bottom: 10px;
             color: #374151;
+            font-size: 18px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quick-question {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+        }
+
+        .quick-question:hover {
+            border-color: #4f46e5;
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
 
         .clear-chat {
@@ -202,16 +289,121 @@
             cursor: pointer;
             font-size: 12px;
             margin-top: 10px;
+            transition: all 0.2s;
+            font-weight: 500;
         }
 
         .clear-chat:hover {
             background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            max-width: 70%;
+            font-size: 14px;
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                border-radius: 10px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .chat-header h1 {
+                font-size: 20px;
+            }
+            
+            .chat-header p {
+                font-size: 12px;
+            }
+            
+            .connection-status {
+                position: static;
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+            
+            .quick-questions {
+                gap: 6px;
+            }
+            
+            .quick-question {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+            
+            .chat-input-wrapper {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            #sendButton {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: 95vh;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message-content {
+                max-width: 90%;
+                font-size: 13px;
+            }
+            
+            .welcome-message {
+                padding: 20px 15px;
+            }
+            
+            .welcome-message h3 {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
+            <div class="connection-status checking" id="connectionStatus">Checking Connection...</div>
             <h1>NeuroInkX Support</h1>
             <p>AI-powered customer support assistant</p>
         </div>
@@ -219,7 +411,15 @@
         <div class="chat-messages" id="chatMessages">
             <div class="welcome-message">
                 <h3>Welcome to NeuroInkX Support! 🚀</h3>
-                <p>Ask me anything about our services, pricing, or how to get started.</p>
+                <p>Ask me anything about our services, pricing, or how to get started with our AI-powered printing solutions.</p>
+                <div class="quick-questions">
+                    <div class="quick-question" onclick="askQuestion('What is NeuroInkX?')">What is NeuroInkX?</div>
+                    <div class="quick-question" onclick="askQuestion('How does AI printing work?')">AI Printing</div>
+                    <div class="quick-question" onclick="askQuestion('What are your pricing plans?')">Pricing Plans</div>
+                    <div class="quick-question" onclick="askQuestion('Do you offer custom solutions?')">Custom Solutions</div>
+                    <div class="quick-question" onclick="askQuestion('How to get started?')">Get Started</div>
+                    <div class="quick-question" onclick="askQuestion('What support do you offer?')">Support Options</div>
+                </div>
             </div>
         </div>
 
@@ -236,7 +436,7 @@
             <div class="chat-input-wrapper">
                 <textarea 
                     id="messageInput" 
-                    placeholder="Type your message here..." 
+                    placeholder="Type your message here... (Press Enter to send, Shift+Enter for new line)" 
                     rows="1"
                     onkeydown="handleKeyDown(event)"
                 ></textarea>
@@ -248,6 +448,7 @@
 
     <script>
         let conversationId = null;
+        // Backend API URL - using relative path since backend serves frontend
         const API_BASE_URL = 'http://65.0.200.146:8000';
 
         // DOM elements
@@ -255,11 +456,37 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        // Check backend connection on load
+        async function checkConnection() {
+            try {
+                connectionStatus.textContent = 'Checking...';
+                connectionStatus.className = 'connection-status checking';
+                
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    connectionStatus.textContent = 'Connected ✅';
+                    connectionStatus.className = 'connection-status connected';
+                    console.log('Backend status:', data);
+                } else {
+                    throw new Error(`Health check failed: ${response.status}`);
+                }
+            } catch (error) {
+                connectionStatus.textContent = 'Disconnected ❌';
+                connectionStatus.className = 'connection-status disconnected';
+                console.error('Backend connection failed:', error);
+                
+                // Add helpful error message
+                addMessage('⚠️ Cannot connect to the backend server. Please make sure the Python backend is running.', false, true);
+            }
+        }
 
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
         // Handle Enter key (with Shift for new line)
@@ -270,21 +497,36 @@
             }
         }
 
+        // Quick question helper
+        function askQuestion(question) {
+            messageInput.value = question;
+            sendMessage();
+        }
+
         // Add message to chat
-        function addMessage(content, isUser = false) {
+        function addMessage(content, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
             
             const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
+            if (isError) {
+                messageContent.className = 'error-message';
+            } else {
+                messageContent.className = 'message-content';
+            }
             messageContent.textContent = content;
             
             const timeDiv = document.createElement('div');
             timeDiv.className = 'message-time';
-            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timeDiv.textContent = new Date().toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
             
             messageDiv.appendChild(messageContent);
-            messageDiv.appendChild(timeDiv);
+            if (!isError) {
+                messageDiv.appendChild(timeDiv);
+            }
             chatMessages.appendChild(messageDiv);
             
             // Scroll to bottom
@@ -303,19 +545,29 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        // Enable/disable input
+        function setInputState(disabled) {
+            messageInput.disabled = disabled;
+            sendButton.disabled = disabled;
+            sendButton.textContent = disabled ? 'Sending...' : 'Send';
+            
+            if (!disabled) {
+                messageInput.focus();
+            }
+        }
+
         // Send message to backend
         async function sendMessage() {
             const message = messageInput.value.trim();
             if (!message) return;
 
-            // Disable input and button
-            messageInput.disabled = true;
-            sendButton.disabled = true;
+            // Clear input and disable
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            setInputState(true);
 
             // Add user message to chat
             addMessage(message, true);
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
 
             // Show typing indicator
             showTypingIndicator(true);
@@ -333,7 +585,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
                 }
 
                 const data = await response.json();
@@ -345,33 +597,55 @@
                 addMessage(data.response, false);
 
             } catch (error) {
-                console.error('Error:', error);
-                addMessage('Sorry, I encountered an error. Please try again.', false);
-            } finally {
-                // Re-enable input and button
-                messageInput.disabled = false;
-                sendButton.disabled = false;
-                messageInput.focus();
+                console.error('Error sending message:', error);
                 
-                // Hide typing indicator
+                let errorMessage = 'Sorry, I encountered an error. Please try again.';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '❌ Cannot connect to the server. Please check if the backend is running.';
+                }
+                
+                addMessage(errorMessage, false, true);
+            } finally {
+                // Re-enable input and hide typing indicator
+                setInputState(false);
                 showTypingIndicator(false);
             }
         }
 
         // Clear chat and start new conversation
         function clearChat() {
-            chatMessages.innerHTML = `
-                <div class="welcome-message">
-                    <h3>Welcome to NeuroInkX Support! 🚀</h3>
-                    <p>Ask me anything about our services, pricing, or how to get started.</p>
-                </div>
-            `;
-            conversationId = null;
-            messageInput.focus();
+            if (confirm('Are you sure you want to clear the conversation?')) {
+                chatMessages.innerHTML = `
+                    <div class="welcome-message">
+                        <h3>Welcome to NeuroInkX Support! 🚀</h3>
+                        <p>Ask me anything about our services, pricing, or how to get started with our AI-powered printing solutions.</p>
+                        <div class="quick-questions">
+                            <div class="quick-question" onclick="askQuestion('What is NeuroInkX?')">What is NeuroInkX?</div>
+                            <div class="quick-question" onclick="askQuestion('How does AI printing work?')">AI Printing</div>
+                            <div class="quick-question" onclick="askQuestion('What are your pricing plans?')">Pricing Plans</div>
+                            <div class="quick-question" onclick="askQuestion('Do you offer custom solutions?')">Custom Solutions</div>
+                            <div class="quick-question" onclick="askQuestion('How to get started?')">Get Started</div>
+                            <div class="quick-question" onclick="askQuestion('What support do you offer?')">Support Options</div>
+                        </div>
+                    </div>
+                `;
+                conversationId = null;
+                messageInput.focus();
+            }
         }
 
         // Initialize
-        messageInput.focus();
+        window.addEventListener('load', function() {
+            messageInput.focus();
+            checkConnection();
+        });
+
+        // Export functions for global access
+        window.handleKeyDown = handleKeyDown;
+        window.sendMessage = sendMessage;
+        window.clearChat = clearChat;
+        window.askQuestion = askQuestion;
     </script>
 </body>
 </html>
