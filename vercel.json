@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "neuroinkx-frontend",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "http://65.0.200.146:8080"
+  }
+}
