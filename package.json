@@ -1,0 +1,12 @@
+{
+  "name": "neuroinkx-frontend",
+  "version": "1.0.0",
+  "description": "NeuroInkX Customer Support Frontend",
+  "scripts": {
+    "build": "echo 'No build step needed for static site'",
+    "dev": "python -m http.server 3000"
+  },
+  "keywords": ["neuroinkx", "chatbot", "customer-support"],
+  "author": "vamsi",
+  "license": "MIT"
+}
