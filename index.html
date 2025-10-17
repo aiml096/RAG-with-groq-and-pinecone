@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroInkX Customer </title>
+    <title>NeuroInkX Customer Support</title>
+    <meta name="description" content="AI-powered customer support for NeuroInkX">
     <style>
         * {
             margin: 0;
@@ -447,9 +448,16 @@
     </div>
 
     <script>
+        // Configuration - Update this with your AWS EC2 public IP/DNS
+        const CONFIG = {
+            API_BASE_URL: ' https://63eccccda35e.ngrok-free.app', // Replace with your EC2 public IP
+            MAX_RETRIES: 3,
+            RETRY_DELAY: 1000,
+            REQUEST_TIMEOUT: 30000
+        };
+
         let conversationId = null;
-        // Backend API URL - using relative path since backend serves frontend
-        const API_BASE_URL = 'https://fef3f568c411.ngrok-free.app';
+        let retryCount = 0;
 
         // DOM elements
         const chatMessages = document.getElementById('chatMessages');
@@ -458,28 +466,37 @@
         const typingIndicator = document.getElementById('typingIndicator');
         const connectionStatus = document.getElementById('connectionStatus');
 
-        // Check backend connection on load
+        // Enhanced connection check with retry
         async function checkConnection() {
             try {
                 connectionStatus.textContent = 'Checking...';
                 connectionStatus.className = 'connection-status checking';
                 
-                const response = await fetch(`${API_BASE_URL}/health`);
+                const response = await fetch(`${CONFIG.API_BASE_URL}/health`, {
+                    signal: AbortSignal.timeout(5000)
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
                     connectionStatus.textContent = 'Connected ✅';
                     connectionStatus.className = 'connection-status connected';
+                    retryCount = 0;
                     console.log('Backend status:', data);
                 } else {
                     throw new Error(`Health check failed: ${response.status}`);
                 }
             } catch (error) {
-                connectionStatus.textContent = 'Disconnected ❌';
-                connectionStatus.className = 'connection-status disconnected';
                 console.error('Backend connection failed:', error);
                 
-                // Add helpful error message
-                addMessage('⚠️ Cannot connect to the backend server. Please make sure the Python backend is running.', false, true);
+                if (retryCount < CONFIG.MAX_RETRIES) {
+                    retryCount++;
+                    connectionStatus.textContent = `Retrying... (${retryCount}/${CONFIG.MAX_RETRIES})`;
+                    setTimeout(checkConnection, CONFIG.RETRY_DELAY);
+                } else {
+                    connectionStatus.textContent = 'Disconnected ❌';
+                    connectionStatus.className = 'connection-status disconnected';
+                    addMessage('⚠️ Cannot connect to the backend server. Please check if the server is running and the URL is correct.', false, true);
+                }
             }
         }
 
@@ -573,7 +590,10 @@
             showTypingIndicator(true);
 
             try {
-                const response = await fetch(`${API_BASE_URL}/chat`, {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+
+                const response = await fetch(`${CONFIG.API_BASE_URL}/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -581,11 +601,15 @@
                     body: JSON.stringify({
                         message: message,
                         conversation_id: conversationId
-                    })
+                    }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
                 const data = await response.json();
@@ -601,8 +625,16 @@
                 
                 let errorMessage = 'Sorry, I encountered an error. Please try again.';
                 
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage = '❌ Cannot connect to the server. Please check if the backend is running.';
+                if (error.name === 'AbortError') {
+                    errorMessage = '⏰ Request timeout. The server is taking too long to respond.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '🌐 Network error. Please check your internet connection and ensure the backend server is running.';
+                } else if (error.message.includes('500')) {
+                    errorMessage = '🔧 Server error. Please try again later.';
+                } else if (error.message.includes('404')) {
+                    errorMessage = '❌ Service unavailable. Please check the API URL.';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = '🛡️ CORS error. Please check backend CORS configuration.';
                 }
                 
                 addMessage(errorMessage, false, true);
